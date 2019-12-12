@@ -51,7 +51,7 @@ var (
 	traitConfigRegexp = regexp.MustCompile(`^([a-z-]+)((?:\.[a-z-]+)+)=(.*)$`)
 )
 
-func newCmdRun(rootCmdOptions *RootCmdOptions) *cobra.Command {
+func newCmdRun(rootCmdOptions *RootCmdOptions) *runCmdOptions {
 	options := runCmdOptions{
 		RootCmdOptions: rootCmdOptions,
 	}
@@ -63,6 +63,8 @@ func newCmdRun(rootCmdOptions *RootCmdOptions) *cobra.Command {
 		Args:  options.validateArgs,
 		RunE:  options.run,
 	}
+
+	options.Command = &cmd
 
 	cmd.Flags().StringVar(&options.IntegrationName, "name", "", "The integration name")
 	cmd.Flags().StringSliceVarP(&options.Dependencies, "dependency", "d", nil, "The integration dependency")
@@ -89,11 +91,12 @@ func newCmdRun(rootCmdOptions *RootCmdOptions) *cobra.Command {
 	// completion support
 	configureKnownCompletions(&cmd)
 
-	return &cmd
+	return &options
 }
 
 type runCmdOptions struct {
 	*RootCmdOptions
+	*cobra.Command
 	Compression     bool
 	Wait            bool
 	Logs            bool
